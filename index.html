@@ -4,346 +4,66 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>투자 실적 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
 <style>
-:root { color-scheme: light; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; background: #f0f2f5; color: #1a1a2e; }
-.header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 24px 32px; }
-.header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
-.header .subtitle { font-size: 0.85rem; opacity: 0.75; }
-.header .rate-badge { display: inline-block; background: #e94560; color: white; padding: 4px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; margin-top: 8px; }
-.container { max-width: 1400px; margin: 0 auto; padding: 24px 20px; }
-.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-.card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #0f3460; }
-.card.pension { border-left-color: #1565c0; }
-.card.personal { border-left-color: #2e7d32; }
-.card.profit { border-left-color: #e94560; }
-.card.daily { border-left-color: #f57c00; }
-.card .label { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.card .value { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; }
-.card .sub { font-size: 0.8rem; color: #888; margin-top: 4px; }
-.card .sub.up { color: #2e7d32; }
-.card .sub.down { color: #c62828; }
-.charts-row { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 24px; }
-.chart-box { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.chart-box h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; color: #333; border-bottom: 2px solid #f0f2f5; padding-bottom: 8px; }
-.chart-full { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
-.chart-full h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; color: #333; border-bottom: 2px solid #f0f2f5; padding-bottom: 8px; }
-.table-box { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; }
-.table-box h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 14px; color: #333; border-bottom: 2px solid #f0f2f5; padding-bottom: 8px; }
-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-th { background: #f8f9fa; color: #555; font-weight: 600; padding: 9px 10px; text-align: right; border-bottom: 2px solid #e9ecef; }
-th:first-child { text-align: left; }
-td { padding: 8px 10px; border-bottom: 1px solid #f0f2f5; text-align: right; }
-td:first-child { text-align: left; font-weight: 500; }
-tr:hover td { background: #f8f9fa; }
-.total-row td { font-weight: 700; background: #f0f4ff; border-top: 2px solid #dee2e6; }
-.pension-row td { background: #e8f4fd; }
-.personal-row td { background: #e8f5e9; }
-.positive { color: #2e7d32; }
-.negative { color: #c62828; }
-.month-label { font-weight: 700; color: #0f3460; }
-.chip { display: inline-block; background: #e3f2fd; color: #1565c0; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
-@media (max-width: 768px) { .cards { grid-template-columns: repeat(2, 1fr); } .charts-row { grid-template-columns: 1fr; } }
+body { font-family: 'Malgun Gothic', Arial, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #161b22, #1f2937); padding: 20px 32px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 20px; font-weight: 700; color: #e6edf3; }
+.header .meta { font-size: 11px; color: #8b949e; margin-top: 3px; }
+.header .total-rate { font-size: 28px; font-weight: 800; color: #3fb950; }
+.header .rate-label { font-size: 11px; color: #8b949e; margin-bottom: 4px; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 20px 32px 8px; }
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; text-align: center; }
+.card .label { font-size: 10px; color: #8b949e; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.card .value { font-size: 22px; font-weight: 700; }
+.card .sub { font-size: 10px; color: #6e7681; margin-top: 4px; }
+.card.blue .value { color: #58a6ff; }
+.card.yellow .value { color: #e3b341; }
+.card.green .value { color: #3fb950; }
+.tabs { display: flex; gap: 0; padding: 14px 32px 0; border-bottom: 1px solid #30363d; }
+.tab-btn { padding: 10px 20px; font-size: 13px; cursor: pointer; color: #8b949e; background: none; border: none; border-bottom: 2px solid transparent; transition: all 0.2s; font-family: inherit; }
+.tab-btn.active { color: #58a6ff; border-bottom-color: #58a6ff; font-weight: 600; }
+.tab-btn:hover:not(.active) { color: #e6edf3; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.chart-grid-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 14px; padding: 16px 32px; }
+.chart-grid-full { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 16px 32px; }
+.chart-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 16px 32px; }
+.chart-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 18px; }
+.chart-card h3 { font-size: 12px; color: #8b949e; margin-bottom: 14px; font-weight: 600; }
+.chart-wrap { position: relative; width: 100%; }
+.stat-chips { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.chip { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 8px 14px; font-size: 11px; }
+.chip .cl { color: #6e7681; font-size: 9px; display: block; margin-bottom: 2px; }
+.chip .cv { font-weight: 700; }
+.table-section { padding: 0 32px 28px; }
+.table-section h3 { font-size: 12px; color: #8b949e; margin-bottom: 10px; font-weight: 600; }
+table { width: 100%; border-collapse: collapse; background: #161b22; border-radius: 12px; overflow: hidden; border: 1px solid #30363d; }
+th { background: #21262d; padding: 9px 12px; text-align: right; font-size: 10px; color: #8b949e; font-weight: 600; border-bottom: 1px solid #30363d; }
+th:first-child, th:nth-child(2) { text-align: left; }
+td { padding: 9px 12px; font-size: 11px; border-top: 1px solid #21262d; text-align: right; color: #e6edf3; }
+td:first-child, td:nth-child(2) { text-align: left; color: #c9d1d9; }
+tr.subtotal td { background: #1c2128; font-weight: 700; color: #58a6ff; }
+tr.total-row td { background: #1a2332; font-weight: 700; color: #3fb950; font-size: 12px; }
+.pos { color: #3fb950; }
+.neg { color: #f85149; }
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>📊 투자 실적 대시보드</h1>
-  <div class="subtitle">기준: 2026-06-15 16:00 &nbsp;|&nbsp; Google Sheets 실시간 &nbsp;|&nbsp; 연금 + 개인투자 통합</div>
-  <div class="rate-badge">총 수익률 +215.79%</div>
+  <div>
+    <h1>📊 투자 실적 대시보드</h1>
+    <div class="meta">기준: 2026-06-15 16:00 &nbsp;|&nbsp; Google Sheets 실시간</div>
+  </div>
+  <div style="text-align:right">
+    <div class="rate-label">전체 수익률</div>
+    <div class="total-rate">+215.79%</div>
+  </div>
 </div>
-
-<div class="container">
-
-<!-- 카드 섹션 -->
 <div class="cards">
-  <div class="card">
-    <div class="label">총 투자원금</div>
-    <div class="value">₩3.2억</div>
-    <div class="sub">₩318,856,416</div>
-  </div>
-  <div class="card profit">
-    <div class="label">총 현재금액</div>
-    <div class="value">₩10.1억</div>
-    <div class="sub">₩1,006,915,867</div>
-  </div>
-  <div class="card pension">
-    <div class="label">총 수익금액</div>
-    <div class="value">₩6.9억</div>
-    <div class="sub">₩688,059,451 (+215.79%)</div>
-  </div>
-  <div class="card daily">
-    <div class="label">전일대비</div>
-    <div class="value" style="color:#2e7d32">▲₩0.1억</div>
-    <div class="sub up">+₩8,466,603 (+0.85%)</div>
-  </div>
+  <div class="card blue"><div class="label">총 투자원금</div><div class="value">₩8.6억</div><div class="sub">₩855,553,789</div></div>
+  <div class="card yellow"><div class="label">총 현재금액</div><div class="value">₩10.1억</div><div class="sub">₩1,006,915,867</div></div>
+  <div class="card green"><div class="label">총 수익금액</div><div class="value">+₩6.9억</div><div class="sub">₩688,059,451</div></div>
+  <div class="card green"><div class="label">전일대비 (vs 6/12)</div><div class="value">+₩0.1억</div><div class="sub">+₩8,466,603 (+0.85%)</div></div>
 </div>
-
-<!-- 연금 / 개인투자 요약 카드 -->
-<div class="cards" style="margin-bottom:24px;">
-  <div class="card pension">
-    <div class="label">💰 연금 현재금액</div>
-    <div class="value">₩5.8억</div>
-    <div class="sub">수익 +₩3.8억 (+189.1%)</div>
-    <div class="sub up">전일대비 ▲₩0.1억 (+2.39%)</div>
-  </div>
-  <div class="card personal">
-    <div class="label">📈 개인투자 현재금액</div>
-    <div class="value">₩4.3억</div>
-    <div class="sub">수익 +₩3.1억 (+260.8%)</div>
-    <div class="sub down">전일대비 ▼₩0.1억 (-1.17%)</div>
-  </div>
-  <div class="card" style="border-left-color:#7b1fa2;">
-    <div class="label">연금 투자원금</div>
-    <div class="value">₩2.0억</div>
-    <div class="sub">₩200,261,041</div>
-  </div>
-  <div class="card" style="border-left-color:#00796b;">
-    <div class="label">개인투자 투자원금</div>
-    <div class="value">₩1.2억</div>
-    <div class="sub">₩118,595,375</div>
-  </div>
-</div>
-
-<!-- 차트 행 -->
-<div class="charts-row">
-  <div class="chart-box">
-    <h3>🥧 계좌별 현재금액 비중</h3>
-    <canvas id="pieChart" height="260"></canvas>
-  </div>
-  <div class="chart-box">
-    <h3>📈 일별 수익률 추이 (누적, 원금 대비)</h3>
-    <canvas id="lineChart" height="200"></canvas>
-  </div>
-</div>
-
-<!-- 월별 바차트 -->
-<div class="chart-full">
-  <h3>📊 월별 현재금액 추이</h3>
-  <canvas id="barChart" height="100"></canvas>
-</div>
-
-<!-- 테이블 1: 계좌별 상세 실적 -->
-<div class="table-box">
-  <h3>📋 계좌별 상세 실적</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>계좌</th>
-        <th>투자원금(원가)</th>
-        <th>현재금액</th>
-        <th>수익금액</th>
-        <th>수익률(배)</th>
-        <th>수익률(%)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="pension-row"><td>퇴직연금(220-91)</td><td>283,053,425</td><td>331,186,785</td><td class="positive">+217,462,681</td><td>1.17x</td><td class="positive">+191.2%</td></tr>
-      <tr class="pension-row"><td>개인연금(기존)</td><td>71,474,786</td><td>75,777,605</td><td class="positive">+59,386,409</td><td>1.06x</td><td class="positive">+362.3%</td></tr>
-      <tr class="pension-row"><td>개인연금(신)</td><td>36,782,652</td><td>39,226,325</td><td class="positive">+22,835,129</td><td>1.07x</td><td class="positive">+139.3%</td></tr>
-      <tr class="pension-row"><td>DC계좌</td><td>109,747,110</td><td>128,366,605</td><td class="positive">+76,862,060</td><td>1.17x</td><td class="positive">+149.2%</td></tr>
-      <tr class="pension-row"><td>퇴직연금(삼성)</td><td>3,087,425</td><td>4,494,205</td><td class="positive">+2,244,205</td><td>1.46x</td><td class="positive">+99.7%</td></tr>
-      <tr class="total-row"><td>🔵 연금 합계</td><td>504,145,398</td><td>579,051,525</td><td class="positive">+378,790,484</td><td>1.15x</td><td class="positive">+189.1%</td></tr>
-      <tr class="personal-row"><td>처리투자(미래에셋)</td><td>68,288,665</td><td>80,087,520</td><td class="positive">+64,245,863</td><td>1.18x</td><td class="positive">+390.8%</td></tr>
-      <tr class="personal-row"><td>은퇴투자(삼성증권)</td><td>48,001</td><td>140,732</td><td class="positive">+92,731</td><td>2.93x</td><td class="positive">+193.2%</td></tr>
-      <tr class="personal-row"><td>은퇴투자(미래에셋)</td><td>148,013,830</td><td>201,823,640</td><td class="positive">+155,169,922</td><td>1.36x</td><td class="positive">+332.6%</td></tr>
-      <tr class="personal-row"><td>ISA 계좌</td><td>70,979,510</td><td>81,960,795</td><td class="positive">+41,460,795</td><td>1.15x</td><td class="positive">+102.4%</td></tr>
-      <tr class="personal-row"><td>RIA 계좌</td><td>64,078,385</td><td>63,251,655</td><td class="positive">+48,251,655</td><td>0.99x</td><td class="positive">+321.7%</td></tr>
-      <tr class="total-row"><td>🟢 개인투자 합계</td><td>351,408,391</td><td>427,864,342</td><td class="positive">+309,268,967</td><td>1.22x</td><td class="positive">+260.8%</td></tr>
-      <tr class="total-row" style="background:#e8eaf6;"><td>▶ 전체 합계</td><td>855,553,789</td><td>1,006,915,867</td><td class="positive">+688,059,451</td><td>1.18x</td><td class="positive">+215.8%</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- 테이블 2: 월별 상세 실적 -->
-<div class="table-box">
-  <h3>📋 월별 상세 실적 (합계)</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>월</th>
-        <th>연금 현재금액</th>
-        <th>개인투자 현재금액</th>
-        <th>전체 현재금액</th>
-        <th>전체 수익금액</th>
-        <th>수익률(%)</th>
-        <th>전월대비</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="month-label">2026-05</td>
-        <td>583,563,370</td><td>462,134,714</td><td>1,045,698,084</td>
-        <td class="positive">+696,682,864</td><td class="positive">+199.6%</td><td>-</td>
-      </tr>
-      <tr>
-        <td class="month-label">2026-06</td>
-        <td>579,051,525</td><td>427,864,342</td><td>1,006,915,867</td>
-        <td class="positive">+688,059,451</td><td class="positive">+215.8%</td>
-        <td class="negative">▼-38,782,217 (-3.7%)</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- 테이블 3: 계좌별 월별 상세 -->
-<div class="table-box">
-  <h3>📋 계좌별 월별 상세 실적</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>월</th>
-        <th>계좌</th>
-        <th>투자원금</th>
-        <th>현재금액</th>
-        <th>수익금액</th>
-        <th>수익률(%)</th>
-        <th>전월대비 금액</th>
-        <th>전월대비(%)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="pension-row"><td class="month-label">2026-05</td><td>퇴직연금(220-91)</td><td>113,724,104</td><td>335,667,170</td><td class="positive">+221,943,066</td><td class="positive">+195.2%</td><td>-</td><td>-</td></tr>
-      <tr class="pension-row"><td></td><td>개인연금(기존)</td><td>16,391,196</td><td>75,003,850</td><td class="positive">+58,612,654</td><td class="positive">+357.6%</td><td>-</td><td>-</td></tr>
-      <tr class="pension-row"><td></td><td>개인연금(신)</td><td>14,550,000</td><td>38,825,210</td><td class="positive">+24,275,210</td><td class="positive">+166.8%</td><td>-</td><td>-</td></tr>
-      <tr class="pension-row"><td></td><td>DC계좌</td><td>51,504,545</td><td>130,270,110</td><td class="positive">+78,765,565</td><td class="positive">+152.9%</td><td>-</td><td>-</td></tr>
-      <tr class="pension-row"><td></td><td>퇴직연금(삼성)</td><td>2,250,000</td><td>3,797,030</td><td class="positive">+1,547,030</td><td class="positive">+68.8%</td><td>-</td><td>-</td></tr>
-      <tr class="total-row"><td></td><td>연금 합계</td><td>198,419,845</td><td>583,563,370</td><td class="positive">+385,143,525</td><td class="positive">+194.1%</td><td>-</td><td>-</td></tr>
-      <tr class="personal-row"><td></td><td>처리투자(미래에셋)</td><td>16,441,657</td><td>81,489,770</td><td class="positive">+65,048,113</td><td class="positive">+395.6%</td><td>-</td><td>-</td></tr>
-      <tr class="personal-row"><td></td><td>은퇴투자(삼성증권)</td><td>49,519</td><td>142,194</td><td class="positive">+142,194</td><td class="positive">+191.8%</td><td>-</td><td>-</td></tr>
-      <tr class="personal-row"><td></td><td>은퇴투자(미래에셋)</td><td>118,653,718</td><td>300,158,015</td><td class="positive">+181,504,297</td><td class="positive">+153.0%</td><td>-</td><td>-</td></tr>
-      <tr class="personal-row"><td></td><td>ISA 계좌</td><td>500,000</td><td>1,890,465</td><td class="positive">+1,390,465</td><td class="positive">+278.1%</td><td>-</td><td>-</td></tr>
-      <tr class="personal-row"><td></td><td>RIA 계좌</td><td>15,000,000</td><td>78,454,270</td><td class="positive">+63,454,270</td><td class="positive">+423.0%</td><td>-</td><td>-</td></tr>
-      <tr class="total-row"><td></td><td>개인투자 합계</td><td>150,595,375</td><td>462,134,714</td><td class="positive">+311,539,339</td><td class="positive">+206.9%</td><td>-</td><td>-</td></tr>
-      <tr class="total-row" style="background:#e8eaf6;"><td></td><td>전체 합계</td><td>349,015,220</td><td>1,045,698,084</td><td class="positive">+696,682,864</td><td class="positive">+199.6%</td><td>-</td><td>-</td></tr>
-
-      <tr class="pension-row"><td class="month-label">2026-06</td><td>퇴직연금(220-91)</td><td>283,053,425</td><td>331,186,785</td><td class="positive">+217,462,681</td><td class="positive">+191.2%</td><td class="negative">-4,480,385</td><td class="negative">-1.3%</td></tr>
-      <tr class="pension-row"><td></td><td>개인연금(기존)</td><td>71,474,786</td><td>75,777,605</td><td class="positive">+59,386,409</td><td class="positive">+362.3%</td><td class="positive">+773,755</td><td class="positive">+1.0%</td></tr>
-      <tr class="pension-row"><td></td><td>개인연금(신)</td><td>36,782,652</td><td>39,226,325</td><td class="positive">+22,835,129</td><td class="positive">+139.3%</td><td class="positive">+401,115</td><td class="positive">+1.0%</td></tr>
-      <tr class="pension-row"><td></td><td>DC계좌</td><td>109,747,110</td><td>128,366,605</td><td class="positive">+76,862,060</td><td class="positive">+149.2%</td><td class="negative">-1,903,505</td><td class="negative">-1.5%</td></tr>
-      <tr class="pension-row"><td></td><td>퇴직연금(삼성)</td><td>3,087,425</td><td>4,494,205</td><td class="positive">+2,244,205</td><td class="positive">+99.7%</td><td class="positive">+697,175</td><td class="positive">+18.4%</td></tr>
-      <tr class="total-row"><td></td><td>연금 합계</td><td>504,145,398</td><td>579,051,525</td><td class="positive">+378,790,484</td><td class="positive">+189.1%</td><td class="negative">-4,511,845</td><td class="negative">-0.8%</td></tr>
-      <tr class="personal-row"><td></td><td>처리투자(미래에셋)</td><td>68,288,665</td><td>80,687,520</td><td class="positive">+64,245,863</td><td class="positive">+390.8%</td><td class="negative">-802,250</td><td class="negative">-1.0%</td></tr>
-      <tr class="personal-row"><td></td><td>은퇴투자(삼성증권)</td><td>48,001</td><td>140,732</td><td class="positive">+92,731</td><td class="positive">+193.2%</td><td class="negative">-1,462</td><td class="negative">-1.0%</td></tr>
-      <tr class="personal-row"><td></td><td>은퇴투자(미래에셋)</td><td>148,013,830</td><td>201,823,640</td><td class="positive">+155,169,922</td><td class="positive">+332.6%</td><td class="negative">-98,334,375</td><td class="negative">-32.8%</td></tr>
-      <tr class="personal-row"><td></td><td>ISA 계좌</td><td>70,979,510</td><td>81,960,795</td><td class="positive">+41,460,795</td><td class="positive">+102.4%</td><td class="positive">+80,070,330</td><td class="positive">+4235.5%</td></tr>
-      <tr class="personal-row"><td></td><td>RIA 계좌</td><td>64,078,385</td><td>63,251,655</td><td class="positive">+48,251,655</td><td class="positive">+321.7%</td><td class="negative">-15,202,615</td><td class="negative">-19.4%</td></tr>
-      <tr class="total-row"><td></td><td>개인투자 합계</td><td>351,408,391</td><td>427,864,342</td><td class="positive">+309,268,967</td><td class="positive">+260.8%</td><td class="negative">-34,270,372</td><td class="negative">-7.4%</td></tr>
-      <tr class="total-row" style="background:#e8eaf6;"><td></td><td>전체 합계</td><td>855,553,789</td><td>1,006,915,867</td><td class="positive">+688,059,451</td><td class="positive">+215.8%</td><td class="negative">-38,782,217</td><td class="negative">-3.7%</td></tr>
-    </tbody>
-  </table>
-</div>
-
-</div><!-- /container -->
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
-<script>
-// 파이차트 - 계좌별 현재금액 비중
-const pieCtx = document.getElementById('pieChart').getContext('2d');
-new Chart(pieCtx, {
-  type: 'doughnut',
-  data: {
-    labels: ['퇴직연금(220-91)', '개인연금(기존)', '개인연금(신)', 'DC계좌', '퇴직연금(삼성)', '처리투자(미래에셋)', '은퇴투자(미래에셋)', 'ISA', 'RIA'],
-    datasets: [{
-      data: [331186785, 75777605, 39226325, 128366605, 4494205, 80687520, 201823640, 81960795, 63251655],
-      backgroundColor: ['#1565c0','#1976d2','#42a5f5','#90caf9','#bbdefb','#2e7d32','#388e3c','#66bb6a','#a5d6a7'],
-      borderWidth: 2, borderColor: '#fff'
-    }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 8 } },
-      tooltip: {
-        callbacks: {
-          label: (ctx) => {
-            const val = ctx.parsed;
-            const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
-            const pct = (val/total*100).toFixed(1);
-            return ` ${(val/1e8).toFixed(2)}억 (${pct}%)`;
-          }
-        }
-      }
-    }
-  }
-});
-
-// 라인차트 - 일별 수익률 추이
-const lineCtx = document.getElementById('lineChart').getContext('2d');
-new Chart(lineCtx, {
-  type: 'line',
-  data: {
-    labels: ['06-04','06-05','06-08','06-09','06-10','06-11','06-12','06-15'],
-    datasets: [
-      {
-        label: '총 수익률(%)',
-        data: [203.2, 162.4, 158.6, 179.6, 185.2, 184.2, 204.5, 215.8],
-        borderColor: '#e94560', backgroundColor: 'rgba(233,69,96,0.08)',
-        tension: 0.4, fill: true, pointRadius: 5, pointBackgroundColor: '#e94560'
-      },
-      {
-        label: '연금 수익률(%)',
-        data: [197.3, 176.5, 155.3, 179.9, 161.6, 164.8, 182.4, 189.1],
-        borderColor: '#1565c0', backgroundColor: 'transparent',
-        tension: 0.4, pointRadius: 4, pointBackgroundColor: '#1565c0'
-      },
-      {
-        label: '개인투자 수익률(%)',
-        data: [211.1, 143.9, 163.0, 179.1, 221.8, 214.4, 239.3, 260.8],
-        borderColor: '#2e7d32', backgroundColor: 'transparent',
-        tension: 0.4, pointRadius: 4, pointBackgroundColor: '#2e7d32'
-      }
-    ]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { labels: { font: { size: 11 } } },
-      tooltip: { mode: 'index', intersect: false }
-    },
-    scales: {
-      y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => v+'%' } },
-      x: { grid: { display: false } }
-    }
-  }
-});
-
-// 바차트 - 월별 현재금액
-const barCtx = document.getElementById('barChart').getContext('2d');
-new Chart(barCtx, {
-  type: 'bar',
-  data: {
-    labels: ['2026-05','2026-06'],
-    datasets: [
-      {
-        label: '연금',
-        data: [583563370, 579051525],
-        backgroundColor: '#1565c0'
-      },
-      {
-        label: '개인투자',
-        data: [462134714, 427864342],
-        backgroundColor: '#2e7d32'
-      }
-    ]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { labels: { font: { size: 11 } } },
-      tooltip: {
-        callbacks: {
-          label: (ctx) => ` ${ctx.dataset.label}: ${(ctx.parsed.y/1e8).toFixed(2)}억`
-        }
-      }
-    },
-    scales: {
-      x: { stacked: true },
-      y: { stacked: true, ticks: { callback: v => (v/1e8).toFixed(1)+'억' }, grid: { color: '#f0f0f0' } }
-    }
-  }
-});
-</script>
-</body>
-</html>
