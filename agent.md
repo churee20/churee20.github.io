@@ -153,7 +153,7 @@ Claude in Chrome을 사용하여 Google Sheets에서 데이터를 읽는다.
 
 ### STEP 4. Investment Dashboard 생성/업데이트
 
-`D:\00.은퇴계획\01.투자실적\투자실적_dashboard.html` 파일을 **전체 재생성**한다. 부분 수치 교체가 아니라, xlsx 데이터를 읽어 HTML 전체를 새로 작성해야 한다.
+`D:\00.은퇴계획\01.투자실적\index.html` 파일을 **전체 재생성**한다. 부분 수치 교체가 아니라, xlsx 데이터를 읽어 HTML 전체를 새로 작성해야 한다.
 
 **데이터 소스 (반드시 xlsx에서 읽어서 반영):**
 
@@ -350,7 +350,7 @@ D:\00.은퇴계획\01.투자실적\
 ├── agent.md                          ← 이 파일 (Agent 지침)
 ├── 투자실적_집계보고서.xlsx            ← 메인 집계 보고서
 ├── 투자실적_일별추적.json              ← 일별 원시 데이터
-├── 투자실적_dashboard.html            ← Investment Dashboard
+├── index.html                        ← Investment Dashboard (GitHub Pages용)
 └── 백업/
     ├── 회사PC_설치가이드.md
     └── 투자실적_일별추적.json (백업)
